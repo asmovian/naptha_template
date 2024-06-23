@@ -6,7 +6,7 @@ logger = get_logger(__name__)
 
 def run(inputs: InputSchema, worker_nodes=None, orchestrator_node=None, flow_run=None, cfg=None):
     logger.info(f"Inputs: {inputs}")
-    return None
+    return ""
 
 if __name__ == "__main__":
 
