@@ -9,7 +9,7 @@ def run(inputs: InputSchema, worker_nodes=None, orchestrator_node=None, flow_run
     logger.info(f"Inputs: {inputs}")
 
     # try to read the 
-    with open(inputs.input_file, "r") as fp:
+    with open(f"{inputs.input_dir}/ftest.txt", "r") as fp:
         line = fp.readline()
 
     return line
