@@ -1,5 +1,5 @@
 from pydantic import BaseModel
 
 class InputSchema(BaseModel):
-    param1: str
-    param2: str
+    question: str
+    input_file: str
