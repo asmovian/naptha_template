@@ -13,7 +13,7 @@ python = "^3.10"
 requests = "^2.31.0"
 pydantic = "^2.7.0"
 PyYAML = "^6.0.1"
-naptha-sdk = {git = "https://github.com/NapthaAI/naptha-sdk.git"}
+chromadb = "^0.5.3"
 
 [tool.poetry.dev-dependencies]
 black = "^24.4.2"
