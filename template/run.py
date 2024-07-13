@@ -2,6 +2,7 @@
 from template.schemas import InputSchema
 from naptha_sdk.utils import get_logger, load_yaml
 import chromadb
+import json
 
 
 logger = get_logger(__name__)
@@ -11,15 +12,22 @@ def run(inputs: InputSchema, worker_nodes=None, orchestrator_node=None, flow_run
 
     client = chromadb.PersistentClient(path=inputs.input_dir)
     collection_name = "roko-telegram"
-    collection = client.get_collection(name=collection_name)
-    num = f"{collection_name} has {collection.count()} entries"
-    logger.info(num)
 
-    # try to read the 
-    # with open(f"{inputs.input_dir}/ftest.txt", "r") as fp:
-        #line = fp.readline()
+    collections = client.list_collections()
+    existing_collection_names = [x.name for x in collections]
+    if collection_name in existing_collection_names:
+        collection = client.get_collection(name=collection_name)
+        num = f"{collection_name} has {collection.count()} entries"
+        logger.info(num)
 
-    return num
+        r = collection.query(query_texts=inputs.question, n_results=5)
+        ret_str = json.dumps(r["documents"], indent=2)
+    else:
+        ret_str = f"Error: Collection {collection_name} not found."
+
+    logger.debug(ret_str)
+
+    return ret_str
 
 
 if __name__ == "__main__":
@@ -28,7 +36,7 @@ if __name__ == "__main__":
     cfg = load_yaml(cfg_path)
 
     inputs = InputSchema(
-        question="question",
-        input_file="4bf5d447ecc749a5b3d42c50b27c8ce0",
+        question="Where should I store my Roko coin?",
+        input_dir="/home/julien/data/naptha/roko-chromadb"
     )
     run(inputs, cfg=cfg)

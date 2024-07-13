@@ -1,7 +1,7 @@
 name: template
 type: template
 author: naptha
-version: 0.1.0
+version: 0.4
 description: Base template for new tasks and flows.
 license: MIT
 
