@@ -2,15 +2,11 @@
 from template.schemas import InputSchema
 from naptha_sdk.utils import get_logger, load_yaml
 import chromadb
-import json
 import asyncio
-from ollama import AsyncClient
+import ollama
+from ollama import Client
 
 logger = get_logger(__name__)
-
-async def ollama_chat(host, model, messages):
-    return await AsyncClient(host=host).chat(model=model, messages=messages)
-
 
 def run(inputs: InputSchema, worker_nodes=None, orchestrator_node=None, flow_run=None, cfg=None):
     logger.info(f"Inputs: {inputs}")
@@ -43,16 +39,15 @@ def run(inputs: InputSchema, worker_nodes=None, orchestrator_node=None, flow_run
 
     logger.debug(messages)
 
-    output = asyncio.run(
-        ollama_chat(cfg["models"]["ollama"]["api_base"], 
-                    cfg["models"]["ollama"]["model"], 
-                    messages
-        )
+    ollama_client = Client(host=cfg["models"]["ollama"]["api_base"])
+    response = ollama_client.chat(
+        model=cfg["models"]["ollama"]["model"], 
+        messages=messages
     )
 
-    logger.debug(output)
+    logger.debug(response)
 
-    return output
+    return response
 
 
 if __name__ == "__main__":
@@ -61,10 +56,13 @@ if __name__ == "__main__":
     cfg = load_yaml(cfg_path)
 
     # Note: this is for local testing only. When running on naptha
-    # it may look like this:
-    # naptha write_storage -i chromadb.zip
+    # it may look like this: first you need to upload the vector db with
+    # the chunked data:
+    # $ naptha write_storage -i chromadb.zip
     # -> storage id for file system = <id>: i.e. something like 1caddaae8ca5495c996db80e33e42da9
-    # naptha run template -p "question='Where should I store my Roko coins?' input_dir='<id>'"
+    # Now run the query:
+    # $ naptha run template -p "question='Where should I store my Roko coins?' input_dir='<id>'"
+
     inputs = InputSchema(
         question="Where should I store my Roko coin?",
         input_dir="/home/julien/data/naptha/roko-chromadb"
